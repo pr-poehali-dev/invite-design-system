@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Template, Track, InviteEvent } from '@/data/invitations';
 import Icon from '@/components/ui/icon';
 
@@ -8,7 +9,13 @@ interface InvitePreviewProps {
   compact?: boolean;
 }
 
+type Lang = 'kz' | 'ru';
+
 const InvitePreview = ({ template, track, event, compact }: InvitePreviewProps) => {
+  const [lang, setLang] = useState<Lang>('kz');
+  const text = lang === 'kz' ? event.textKz : event.textRu;
+  const subtitle = lang === 'kz' ? template.nameKz : template.name;
+
   return (
     <div
       className="relative overflow-hidden rounded-3xl shadow-2xl animate-scale-in"
@@ -23,11 +30,26 @@ const InvitePreview = ({ template, track, event, compact }: InvitePreviewProps) 
 
       <div className="absolute inset-3 rounded-2xl border-2 border-white/40 pointer-events-none" />
 
+      {/* Language switch */}
+      <div className="absolute top-5 right-5 z-20 flex rounded-full bg-white/15 p-0.5 backdrop-blur-sm">
+        {(['kz', 'ru'] as const).map((l) => (
+          <button
+            key={l}
+            onClick={() => setLang(l)}
+            className={`rounded-full px-3 py-1 text-xs font-body font-medium transition-all ${
+              lang === l ? 'bg-white text-gray-900' : 'text-white/80'
+            }`}
+          >
+            {l === 'kz' ? 'ҚАЗ' : 'РУС'}
+          </button>
+        ))}
+      </div>
+
       <div className={`relative z-10 flex flex-col items-center text-center text-white ${compact ? 'p-6 gap-3' : 'p-10 gap-5'}`}>
         <div className={`${compact ? 'text-4xl' : 'text-6xl'} animate-float`}>{template.emoji}</div>
 
         <p className="font-body uppercase tracking-[0.3em] text-xs text-white/80">
-          {template.nameKz}
+          {subtitle}
         </p>
 
         <h2 className={`font-script ${compact ? 'text-2xl' : 'text-4xl'} leading-tight`}>
@@ -45,7 +67,7 @@ const InvitePreview = ({ template, track, event, compact }: InvitePreviewProps) 
 
         {!compact && (
           <p className="font-body text-sm text-white/90 max-w-xs leading-relaxed">
-            {event.textKz}
+            {text}
           </p>
         )}
 

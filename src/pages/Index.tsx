@@ -4,7 +4,11 @@ import {
   TRACKS,
   EVENTS as INITIAL_EVENTS,
   DEFAULT_TEXT_KZ,
+  DEFAULT_TEXT_RU,
+  LESSON_TEXT_KZ,
+  LESSON_TEXT_RU,
   InviteEvent,
+  Category,
 } from '@/data/invitations';
 import InvitePreview from '@/components/InvitePreview';
 import { Button } from '@/components/ui/button';
@@ -25,6 +29,7 @@ const Index = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [tab, setTab] = useState<Tab>('events');
+  const [tplCat, setTplCat] = useState<Category>('toy');
 
   const selectedEvent = events.find((e) => e.id === selectedEventId)!;
   const selectedTemplate = TEMPLATES.find((t) => t.id === selectedEvent.templateId)!;
@@ -47,21 +52,25 @@ const Index = () => {
     }
   };
 
-  const addEvent = () => {
+  const addEvent = (cat: Category) => {
     const id = 'e' + Date.now();
+    const tpl = TEMPLATES.find((t) => t.category === cat)!;
+    const isLesson = cat === 'lesson';
     const newEvent: InviteEvent = {
       id,
-      title: 'Жаңа той',
-      templateId: TEMPLATES[0].id,
+      title: isLesson ? 'Ашық сабақ' : 'Жаңа той',
+      templateId: tpl.id,
       trackId: TRACKS[0].id,
-      guestName: 'Құрметті қонақ',
+      guestName: isLesson ? 'Құрметті әріптес' : 'Құрметті қонақ',
       date: '1 қаңтар 2026',
-      place: 'Той сарайы',
-      textKz: DEFAULT_TEXT_KZ,
+      place: isLesson ? 'Мектеп, кабинет' : 'Той сарайы',
+      textKz: isLesson ? LESSON_TEXT_KZ : DEFAULT_TEXT_KZ,
+      textRu: isLesson ? LESSON_TEXT_RU : DEFAULT_TEXT_RU,
     };
     setEvents((prev) => [...prev, newEvent]);
     setSelectedEventId(id);
-    toast.success('Жаңа шақыру қосылды');
+    setTplCat(cat);
+    toast.success(isLesson ? 'Ашық сабаққа шақыру қосылды' : 'Жаңа шақыру қосылды');
   };
 
   return (
@@ -99,8 +108,19 @@ const Index = () => {
           Әрбір тойға <span className="text-gold-gradient">ерекше шақыру</span>
         </h2>
         <p className="font-body text-muted-foreground max-w-xl mx-auto">
-          Создавайте красивые приглашения, меняйте имена гостей и отправляйте каждому свой вариант — оригинал останется нетронутым.
+          Создавайте красивые приглашения на тои и открытые уроки на двух языках — қазақша и на русском. Меняйте имена гостей и отправляйте каждому свой вариант.
         </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-3 font-body text-sm">
+          <span className="flex items-center gap-2 rounded-full bg-card px-4 py-2 shadow-sm">
+            <Icon name="PartyPopper" size={16} className="text-accent" /> Тойлар
+          </span>
+          <span className="flex items-center gap-2 rounded-full bg-card px-4 py-2 shadow-sm">
+            <Icon name="GraduationCap" size={16} className="text-primary" /> Ашық сабақтар
+          </span>
+          <span className="flex items-center gap-2 rounded-full bg-card px-4 py-2 shadow-sm">
+            <Icon name="Languages" size={16} className="text-secondary-foreground" /> ҚАЗ / РУС
+          </span>
+        </div>
       </section>
 
       <main className="container pb-24 grid lg:grid-cols-[1fr_400px] gap-10 items-start">
@@ -132,11 +152,16 @@ const Index = () => {
               {/* Events tab */}
               {tab === 'events' && (
                 <div className="space-y-6 animate-fade-in">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-display text-2xl font-semibold">Мероприятия</h3>
-                    <Button size="sm" onClick={addEvent} className="gap-1">
-                      <Icon name="Plus" size={16} /> Қосу
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => addEvent('toy')} className="gap-1">
+                        <Icon name="PartyPopper" size={16} /> Той
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => addEvent('lesson')} className="gap-1">
+                        <Icon name="GraduationCap" size={16} /> Ашық сабақ
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-3">
                     {events.map((e) => {
@@ -203,18 +228,34 @@ const Index = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-1.5">
-                      <Label>Қазақша мәтін</Label>
-                      <Textarea
-                        rows={3}
-                        value={selectedEvent.textKz}
-                        onChange={(e) => updateEvent({ textKz: e.target.value })}
-                      />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label>🇰🇿 Қазақша мәтін</Label>
+                        <Textarea
+                          rows={4}
+                          value={selectedEvent.textKz}
+                          onChange={(e) => updateEvent({ textKz: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label>🇷🇺 Русский текст</Label>
+                        <Textarea
+                          rows={4}
+                          value={selectedEvent.textRu}
+                          onChange={(e) => updateEvent({ textRu: e.target.value })}
+                        />
+                      </div>
                     </div>
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() => updateEvent({ textKz: DEFAULT_TEXT_KZ })}
+                      onClick={() => {
+                        const lesson = selectedTemplate.category === 'lesson';
+                        updateEvent({
+                          textKz: lesson ? LESSON_TEXT_KZ : DEFAULT_TEXT_KZ,
+                          textRu: lesson ? LESSON_TEXT_RU : DEFAULT_TEXT_RU,
+                        });
+                      }}
                       className="gap-1"
                     >
                       <Icon name="RotateCcw" size={14} /> Стандартный текст
@@ -227,8 +268,26 @@ const Index = () => {
               {tab === 'templates' && (
                 <div className="space-y-4 animate-fade-in">
                   <h3 className="font-display text-2xl font-semibold">Шаблоны оформления</h3>
+                  <div className="flex gap-2 rounded-2xl bg-muted p-1">
+                    {([
+                      { k: 'toy', label: 'Тойлар', icon: 'PartyPopper' },
+                      { k: 'lesson', label: 'Ашық сабақтар', icon: 'GraduationCap' },
+                    ] as const).map((c) => (
+                      <button
+                        key={c.k}
+                        onClick={() => setTplCat(c.k)}
+                        className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 font-body text-sm transition-all ${
+                          tplCat === c.k
+                            ? 'bg-card text-primary shadow font-medium'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        <Icon name={c.icon} size={16} /> {c.label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {TEMPLATES.map((t) => (
+                    {TEMPLATES.filter((t) => t.category === tplCat).map((t) => (
                       <button
                         key={t.id}
                         onClick={() => updateEvent({ templateId: t.id })}
