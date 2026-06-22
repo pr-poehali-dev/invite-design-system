@@ -4,35 +4,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 40 50% 98%;
+    --foreground: 195 60% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 195 60% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 195 60% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 184 70% 38%;
+    --primary-foreground: 40 50% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 38 92% 55%;
+    --secondary-foreground: 195 60% 12%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 184 25% 94%;
+    --muted-foreground: 195 20% 42%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 330 75% 56%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 184 30% 88%;
+    --input: 184 30% 88%;
+    --ring: 184 70% 38%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -96,6 +96,40 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+  }
+}
+
+@layer utilities {
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #d4a017, #f0c75e, #d4a017);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .bg-festive {
+    background:
+      radial-gradient(
+        circle at 15% 20%,
+        hsl(330 75% 56% / 0.12),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 85% 30%,
+        hsl(38 92% 55% / 0.15),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 50% 90%,
+        hsl(184 70% 38% / 0.12),
+        transparent 45%
+      ),
+      hsl(40 50% 98%);
+  }
+  .ornament-border {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(hsl(0 0% 100%), hsl(0 0% 100%)) padding-box,
+      linear-gradient(135deg, #d4a017, #f0c75e, #14b8a6, #ec4899) border-box;
   }
 }
